@@ -12,6 +12,33 @@ WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 BLACK = (0, 0, 0)
 
+# Konfiguracja kwadratów
+PE_SQUARES = [
+    {"rect": (90, 450, 50, 50), "message": "Siłownia"},
+    {"rect": (100, 100, 50, 50), "message": "Ścianka wspinaczkowa"},
+    {"rect": (400, 150, 50, 50), "message": "Siatka"},
+    {"rect": (620, 250, 50, 50), "message": "Koszykówka"},
+    {"rect": (600, 500, 50, 50), "message": "ping-pong"}
+]
+
+PAYMENTS_SQUARES = [
+    {"rect": (90, 380, 50, 50), "message": "ECTS"},
+    {"rect": (270, 380, 50, 50), "message": "Akademik"},
+    {"rect": (420, 310, 50, 50), "message": "Ubezpieczenie"},
+    {"rect": (640, 380, 50, 50), "message": "Legitymacja"}
+
+
+
+]
+
+START_POSITIONS = {
+    "payments": (400, 500),
+    "pe_enrollments": (100, 500)
+}
+
+# Stałe czasowe
+MESSAGE_DURATION = 2000  # 2 sekundy
+
 # Wczytanie tła
 background = pygame.image.load("map.png")
 background = pygame.transform.scale(background, (WIDTH, HEIGHT))
@@ -63,14 +90,18 @@ current_frame = 0
 
 # Pozycje i zmienne
 car_x, car_y = 400, 280
-character_x, character_y = 350, 450  # pozycja postaci
-speed = 5
+character_x, character_y = 350, 450
+speed = 15
 buildings = [(100, 0), (730, 225)]
 current_background = background
 inside_building = False
 entry_position = None
 near_building = False
 font = pygame.font.Font(None, 36)
+active_message = None
+action_message = None
+action_message_time = 0
+
 
 def update_animation():
     global animation_counter, current_frame
@@ -82,38 +113,69 @@ def update_animation():
     else:
         current_frame = 0
 
+
 def get_player_image():
     if facing == "prawo":
         return prawo_idzie_img if current_frame else prawo_img
     else:
         return lewo_idzie_img if current_frame else lewo_img
 
+
 def draw_squares():
-    if not inside_building:
+    if inside_building:
+        if current_background == background1:
+            for square in PAYMENTS_SQUARES:
+                pygame.draw.rect(screen, RED, square["rect"])
+        elif current_background == background2:
+            for square in PE_SQUARES:
+                pygame.draw.rect(screen, RED, square["rect"])
+    else:
         pygame.draw.rect(screen, RED, (100, 0, 50, 50))
         pygame.draw.rect(screen, RED, (730, 225, 50, 50))
+
 
 running = True
 while running:
     screen.blit(current_background, (0, 0))
     draw_squares()
 
+    current_time = pygame.time.get_ticks()
+    active_message = None
+
+    # Obsługa zdarzeń
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+
         elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_e and inside_building:
+            if event.key == pygame.K_q and inside_building:
                 inside_building = False
                 current_background = background
                 if entry_position:
                     car_x, car_y = entry_position
+
+            elif event.key == pygame.K_e and inside_building:
+                # Sprawdź kolizję z kwadratami
+                player_rect = pygame.Rect(character_x, character_y, PLAYER_WIDTH, PLAYER_HEIGHT)
+                squares = PAYMENTS_SQUARES if current_background == background1 else PE_SQUARES if current_background == background2 else []
+
+                for square in squares:
+                    square_rect = pygame.Rect(square["rect"])
+                    if player_rect.colliderect(square_rect):
+                        action_message = "Kliknales w kwadracik essa!"
+                        action_message_time = current_time
+                        break
+
             elif event.key == pygame.K_e and near_building and not inside_building:
                 inside_building = True
                 if near_building == (100, 0):
                     current_background = background1
+                    character_x, character_y = START_POSITIONS["payments"]
                 elif near_building == (730, 225):
                     current_background = background2
+                    character_x, character_y = START_POSITIONS["pe_enrollments"]
 
+    # Aktualizacja stanu gry
     keys = pygame.key.get_pressed()
     is_moving = False
 
@@ -134,21 +196,32 @@ while running:
             new_y += speed
             is_moving = True
 
+        # Sprawdzanie kolizji z maską
         player_center = (new_x + PLAYER_WIDTH // 2, new_y + PLAYER_HEIGHT // 2)
-
         if current_background == background1:
             pixel_color = payments_mask.get_at(player_center)
-            if pixel_color == (255, 255, 255, 255):
-                character_x, character_y = new_x, new_y
         elif current_background == background2:
             pixel_color = pe_enrollment_mask.get_at(player_center)
-            if pixel_color == (255, 255, 255, 255):
-                character_x, character_y = new_x, new_y
         else:
+            pixel_color = (0, 0, 0, 0)
+
+        if pixel_color == (255, 255, 255, 255):
             character_x, character_y = new_x, new_y
 
+        # Sprawdzanie kolizji z kwadratami
+        player_rect = pygame.Rect(character_x, character_y, PLAYER_WIDTH, PLAYER_HEIGHT)
+        squares = PAYMENTS_SQUARES if current_background == background1 else PE_SQUARES if current_background == background2 else []
+
+        for square in squares:
+            square_rect = pygame.Rect(square["rect"])
+            if player_rect.colliderect(square_rect):
+                active_message = square["message"]
+                break
+
         update_animation()
+
     else:
+        # Poruszanie się pojazdem
         new_x, new_y = car_x, car_y
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
             new_x -= speed
@@ -168,16 +241,31 @@ while running:
 
         entry_position = (car_x, car_y)
         near_building = None
-
         for building in buildings:
             if (building[0] - 25 <= car_x <= building[0] + 25 and
                     building[1] - 25 <= car_y <= building[1] + 25):
                 near_building = building
                 break
 
+    # Renderowanie
     if inside_building:
         screen.blit(get_player_image(), (character_x, character_y))
+
+        # Wyświetlanie komunikatów
+        if active_message:
+            text = font.render(active_message, True, BLACK, WHITE)
+            text_rect = text.get_rect(center=(character_x + PLAYER_WIDTH // 2, character_y - 20))
+            screen.blit(text, text_rect)
+
+        if action_message and (current_time - action_message_time) < MESSAGE_DURATION:
+            text = font.render(action_message, True, BLACK, WHITE)
+            text_rect = text.get_rect(center=(WIDTH // 2, 50))
+            screen.blit(text, text_rect)
+        else:
+            action_message = None
+
     else:
+        # Renderowanie pojazdu
         if car_direction == "left":
             screen.blit(car_left, (car_x, car_y))
         elif car_direction == "right":
@@ -189,10 +277,8 @@ while running:
 
         if near_building:
             text = font.render("Wciśnij E, aby wejść", True, BLACK)
-            text_width, text_height = text.get_size()
-            text_x = max(0, min(car_x - 50, WIDTH - text_width))
-            text_y = max(0, min(car_y - 40, HEIGHT - text_height))
-            screen.blit(text, (text_x, text_y))
+            text_rect = text.get_rect(center=(car_x + 30, car_y - 20))
+            screen.blit(text, text_rect)
 
     pygame.display.flip()
     pygame.time.delay(30)
