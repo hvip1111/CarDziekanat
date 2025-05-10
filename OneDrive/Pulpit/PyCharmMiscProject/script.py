@@ -11,7 +11,30 @@ pygame.display.set_caption("Gra z określonymi ścieżkami")
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 BLACK = (0, 0, 0)
+try:
+    font = pygame.font.Font('minecraft.ttf', 25)
+    print("Czcionka Munro została wczytana.")
+except Exception as e:
+    print(f"Błąd ładowania czcionki: {e}")
+    font = pygame.font.Font(None, 36)
 
+
+def render_text_with_outline(font, text, text_color, outline_color, outline_thickness=1):
+    # Renderuj tekst w kolorze obwódki wielokrotnie z przesunięciem
+    outline_surface = pygame.Surface(font.size(text), pygame.SRCALPHA)
+
+    # Renderuj obwódkę wokół tekstu
+    for dx in range(-outline_thickness, outline_thickness + 1):
+        for dy in range(-outline_thickness, outline_thickness + 1):
+            if dx != 0 or dy != 0:
+                text_outline = font.render(text, True, outline_color)
+                outline_surface.blit(text_outline, (dx + outline_thickness, dy + outline_thickness))
+
+    # Renderuj główny tekst na wierzchu
+    text_main = font.render(text, True, text_color)
+    outline_surface.blit(text_main, (outline_thickness, outline_thickness))
+
+    return outline_surface
 # Konfiguracja kwadratów
 PE_SQUARES = [
     {"rect": (90, 450, 50, 50), "message": "Siłownia"},
@@ -97,7 +120,6 @@ current_background = background
 inside_building = False
 entry_position = None
 near_building = False
-font = pygame.font.Font(None, 36)
 active_message = None
 action_message = None
 action_message_time = 0
@@ -253,17 +275,16 @@ while running:
 
         # Wyświetlanie komunikatów
         if active_message:
-            text = font.render(active_message, True, BLACK, WHITE)
+            text = font.render(active_message, True, BLACK)  # Usunięto białe tło
             text_rect = text.get_rect(center=(character_x + PLAYER_WIDTH // 2, character_y - 20))
             screen.blit(text, text_rect)
 
         if action_message and (current_time - action_message_time) < MESSAGE_DURATION:
-            text = font.render(action_message, True, BLACK, WHITE)
+            text = font.render(action_message, True, BLACK)  # Usunięto białe tło
             text_rect = text.get_rect(center=(WIDTH // 2, 50))
             screen.blit(text, text_rect)
         else:
             action_message = None
-
     else:
         # Renderowanie pojazdu
         if car_direction == "left":
