@@ -1,5 +1,6 @@
 import pygame
-
+clock = pygame.time.Clock()
+FPS = 60
 pygame.init()
 
 # Ustawienia ekranu
@@ -64,6 +65,7 @@ def get_clamped_text_rect(text_surface, car_pos):
 
     return text_rect
 
+
 # Konfiguracja kwadratów
 PE_SQUARES = [
     {"rect": (90, 450, 50, 50), "message": "Siłownia"},
@@ -78,8 +80,6 @@ PAYMENTS_SQUARES = [
     {"rect": (270, 380, 50, 50), "message": "Akademik"},
     {"rect": (420, 310, 50, 50), "message": "Ubezpieczenie"},
     {"rect": (640, 380, 50, 50), "message": "Legitymacja"}
-
-
 
 ]
 
@@ -143,7 +143,8 @@ current_frame = 0
 # Pozycje i zmienne
 car_x, car_y = 400, 280
 character_x, character_y = 350, 450
-speed = 15
+speed_outside = 10
+speed_inside = 4
 buildings = [(100, 0), (730, 225)]
 current_background = background
 inside_building = False
@@ -233,18 +234,18 @@ while running:
     if inside_building:
         new_x, new_y = character_x, character_y
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-            new_x -= speed
+            new_x -= speed_inside
             facing = "lewo"
             is_moving = True
         if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-            new_x += speed
+            new_x += speed_inside
             facing = "prawo"
             is_moving = True
         if keys[pygame.K_UP] or keys[pygame.K_w]:
-            new_y -= speed
+            new_y -= speed_inside
             is_moving = True
         if keys[pygame.K_DOWN] or keys[pygame.K_s]:
-            new_y += speed
+            new_y += speed_inside
             is_moving = True
 
         # Sprawdzanie kolizji z maską
@@ -271,26 +272,32 @@ while running:
 
         update_animation()
 
+
     else:
         # Poruszanie się pojazdem
         new_x, new_y = car_x, car_y
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-            new_x -= speed
+            new_x -= speed_outside
             car_direction = "left"
         elif keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-            new_x += speed
+            new_x += speed_outside
             car_direction = "right"
         elif keys[pygame.K_UP] or keys[pygame.K_w]:
-            new_y -= speed
+            new_y -= speed_outside
             car_direction = "up"
         elif keys[pygame.K_DOWN] or keys[pygame.K_s]:
-            new_y += speed
+            new_y += speed_outside
             car_direction = "down"
-
-        if road_mask.get_at((new_x + 25, new_y + 25)) == (255, 255, 255, 255):
-            car_x, car_y = new_x, new_y
-
+        # Sprawdzanie kolizji z uwzględnieniem granic mapy
+        if (0 <= new_x <= road_mask.get_width() - 10 and
+                0 <= new_y <= road_mask.get_height() - 10):
+            try:
+                if road_mask.get_at((new_x + 25, new_y + 25)) == (255, 255, 255, 255):
+                    car_x, car_y = new_x, new_y
+            except IndexError:
+                pass  # Blokada ruchu poza mapę
         entry_position = (car_x, car_y)
+
         near_building = None
         for building in buildings:
             if (building[0] - 25 <= car_x <= building[0] + 25 and
@@ -331,9 +338,7 @@ while running:
             text_rect = get_clamped_text_rect(text_surface, (car_x, car_y))
             screen.blit(text_surface, text_rect)
 
-
-
     pygame.display.flip()
-    pygame.time.delay(30)
+    clock.tick(FPS)
 
 pygame.quit()
