@@ -11,30 +11,59 @@ pygame.display.set_caption("Gra z określonymi ścieżkami")
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 BLACK = (0, 0, 0)
+YELLOW = (255, 255, 0)
 try:
-    font = pygame.font.Font('minecraft.ttf', 25)
+    font = pygame.font.Font('munro.ttf', 18)
     print("Czcionka Munro została wczytana.")
 except Exception as e:
     print(f"Błąd ładowania czcionki: {e}")
     font = pygame.font.Font(None, 36)
 
 
+# Poprawiona funkcja do renderowania tekstu z obwódką
 def render_text_with_outline(font, text, text_color, outline_color, outline_thickness=1):
-    # Renderuj tekst w kolorze obwódki wielokrotnie z przesunięciem
-    outline_surface = pygame.Surface(font.size(text), pygame.SRCALPHA)
+    # Oblicz rozmiar z uwzględnieniem obwódki
+    text_width, text_height = font.size(text)
+    surface_size = (text_width + 2 * outline_thickness, text_height + 2 * outline_thickness)
+    text_surface = pygame.Surface(surface_size, pygame.SRCALPHA)
 
-    # Renderuj obwódkę wokół tekstu
+    # Renderowanie obwódki
     for dx in range(-outline_thickness, outline_thickness + 1):
         for dy in range(-outline_thickness, outline_thickness + 1):
             if dx != 0 or dy != 0:
                 text_outline = font.render(text, True, outline_color)
-                outline_surface.blit(text_outline, (dx + outline_thickness, dy + outline_thickness))
+                text_surface.blit(text_outline, (dx + outline_thickness, dy + outline_thickness))
 
-    # Renderuj główny tekst na wierzchu
+    # Główny tekst
     text_main = font.render(text, True, text_color)
-    outline_surface.blit(text_main, (outline_thickness, outline_thickness))
+    text_surface.blit(text_main, (outline_thickness, outline_thickness))
 
-    return outline_surface
+    return text_surface
+
+
+# Funkcja do bezpiecznego pozycjonowania tekstu
+def get_clamped_text_rect(text_surface, car_pos):
+    x, y = car_pos
+    text_rect = text_surface.get_rect(center=(x + 30, y - 20))
+
+    # Korekta pozycji dla lewej krawędzi
+    if text_rect.left < 0:
+        text_rect.left = 0
+
+    # Korekta pozycji dla prawej krawędzi
+    if text_rect.right > WIDTH:
+        text_rect.right = WIDTH
+
+    # Korekta pozycji dla górnej krawędzi
+    if text_rect.top < 0:
+        text_rect.top = 0
+
+    # Korekta pozycji dla dolnej krawędzi
+    if text_rect.bottom > HEIGHT:
+        text_rect.bottom = HEIGHT
+
+    return text_rect
+
 # Konfiguracja kwadratów
 PE_SQUARES = [
     {"rect": (90, 450, 50, 50), "message": "Siłownia"},
@@ -275,14 +304,14 @@ while running:
 
         # Wyświetlanie komunikatów
         if active_message:
-            text = font.render(active_message, True, BLACK)  # Usunięto białe tło
-            text_rect = text.get_rect(center=(character_x + PLAYER_WIDTH // 2, character_y - 20))
-            screen.blit(text, text_rect)
+            text_surface = render_text_with_outline(font, active_message, BLACK, YELLOW)
+            text_rect = get_clamped_text_rect(text_surface, (character_x, character_y))
+            screen.blit(text_surface, text_rect)
 
         if action_message and (current_time - action_message_time) < MESSAGE_DURATION:
-            text = font.render(action_message, True, BLACK)  # Usunięto białe tło
-            text_rect = text.get_rect(center=(WIDTH // 2, 50))
-            screen.blit(text, text_rect)
+            text_surface = render_text_with_outline(font, action_message, BLACK, YELLOW)
+            text_rect = text_surface.get_rect(center=(WIDTH // 2, 50))
+            screen.blit(text_surface, text_rect)
         else:
             action_message = None
     else:
@@ -297,9 +326,12 @@ while running:
             screen.blit(car_down, (car_x, car_y))
 
         if near_building:
-            text = font.render("Wciśnij E, aby wejść", True, BLACK)
-            text_rect = text.get_rect(center=(car_x + 30, car_y - 20))
-            screen.blit(text, text_rect)
+            font = pygame.font.Font('munro.ttf', 13)
+            text_surface = render_text_with_outline(font, "Wciśnij E, aby wejść", BLACK, YELLOW)
+            text_rect = get_clamped_text_rect(text_surface, (car_x, car_y))
+            screen.blit(text_surface, text_rect)
+
+
 
     pygame.display.flip()
     pygame.time.delay(30)
