@@ -1,15 +1,24 @@
 import pygame
 import random
 import sys
+from PIL import Image
+import pygame
+import time
 
 clock = pygame.time.Clock()
 FPS = 60
 pygame.init()
 
+
 # Ustawienia ekranu
 WIDTH, HEIGHT = 800, 600
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Gra Uczelniana")
+
+coins = 0  # Początkowa ilość monet
+coin_img = pygame.image.load("coin.gif").convert_alpha()
+coin_img = pygame.transform.scale(coin_img, (30, 30))
+
 
 # Kolory
 WHITE = (255, 255, 255)
@@ -58,6 +67,13 @@ PE_SQUARES = [
     {"rect": (400, 150, 50, 50), "message": "Siatka"},
     {"rect": (620, 250, 50, 50), "message": "Koszykówka"},
     {"rect": (600, 500, 50, 50), "message": "ping-pong"}
+]
+PE_SQUARES_2 = [
+    {"rect": (90, 460, 50, 50), "message": "Siłownia"},
+    {"rect": (140, 195, 50, 50), "message": "Ścianka wspinaczkowa"},
+    {"rect": (440, 230, 50, 50), "message": "Siatka"},
+    {"rect": (620, 260, 50, 50), "message": "Koszykówka"},
+    {"rect": (600, 530, 50, 50), "message": "ping-pong"}
 ]
 
 PAYMENTS_SQUARES = [
@@ -143,12 +159,12 @@ subjects = [
     "Fizyka"
 ]
 grades = {
-    subject: [random.randint(1, 5) for _ in range(random.randint(3, 5))]
+    subject: [random.randint(2, 5) for _ in range(random.randint(3, 5))]
     for subject in subjects
 }
 
 grades = {
-    subject: [random.randint(1, 5) for _ in range(random.randint(3, 5))]
+    subject: [random.randint(2, 5) for _ in range(random.randint(3, 5))]
     for subject in subjects
 }
 
@@ -172,20 +188,32 @@ def get_player_image():
         return prawo_idzie_img if current_frame else prawo_img
     return lewo_idzie_img if current_frame else lewo_img
 
-
+LIGHT_GREEN = (144, 238, 144, 10)
 def draw_squares():
     if inside_building:
-        if current_background == background1:
-            [pygame.draw.rect(screen, RED, sq["rect"]) for sq in PAYMENTS_SQUARES]
-        elif current_background == background2:
-            [pygame.draw.rect(screen, RED, sq["rect"]) for sq in PE_SQUARES]
+        # if current_background == background1:
+        #     for sq in PAYMENTS_SQUARES:
+        #         x, y, w, h = sq["rect"]
+        #         center = (x + w // 2, y + h // 2)
+        #         radius = min(w, h) // 2
+        #         pygame.draw.circle(screen, LIGHT_GREEN, center, radius, width=3)
+        if current_background == background2:
+            for sq in PE_SQUARES_2:
+                x, y, w, h = sq["rect"]
+                center = (x + w // 2, y + h // 2)
+                radius = min(w, h) // 2
+                pygame.draw.circle(screen, LIGHT_GREEN, center, radius, width=3)
         elif current_background == background3:
-            [pygame.draw.rect(screen, RED, sq["rect"]) for sq in GRADES_SQUARES]
+            for sq in GRADES_SQUARES:
+                x, y, w, h = sq["rect"]
+                center = (x + w // 2, y + h // 2)
+                radius = min(w, h) // 2
+                pygame.draw.circle(screen, LIGHT_GREEN, center, radius, width=3)
     else:
         for x, y in [(100, 0), (730, 225), (390, 380)]:
-            pygame.draw.rect(screen, RED, (x, y, 50, 50))
-
-
+            center = (x + 25, y + 25)
+            radius = 25
+            pygame.draw.circle(screen, LIGHT_GREEN, center, radius, width=3)
 def handle_grades_display():
     grades_bg_rect = grades_bg.get_rect(topleft=(192, 162))
     screen.blit(grades_bg, grades_bg_rect)
@@ -222,6 +250,16 @@ while running:
     screen.blit(current_background, (0, 0))
     current_time = pygame.time.get_ticks()
     active_message = None
+
+    # Rysowanie interfejsu monet
+    coins_text = font.render(f"{coins}", True, BLACK)
+    coins_rect = coins_text.get_rect(topright=(WIDTH - 10, 10))
+    screen.blit(coins_text, coins_rect)
+
+    # Rysowanie obrazka monety
+    coin_rect = coin_img.get_rect(topright=(coins_rect.left - 5, coins_rect.centery - 15))
+    screen.blit(coin_img, coin_rect)
+
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
