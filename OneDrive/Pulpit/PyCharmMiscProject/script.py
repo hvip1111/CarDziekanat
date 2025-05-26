@@ -14,7 +14,7 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Gra Uczelniana")
 
 # --- Zmiany dla Animacji Monety ---
-COIN_SIZE = (30, 30)
+COIN_SIZE = (40, 40)
 coin_frames = []
 try:
     gif_image = Image.open("coin.gif")
@@ -170,7 +170,7 @@ lewo_img = pygame.transform.scale(lewo_img, (PLAYER_WIDTH, PLAYER_HEIGHT))
 lewo_idzie_img = pygame.image.load("character_left_move.png").convert_alpha()
 lewo_idzie_img = pygame.transform.scale(lewo_idzie_img, (PLAYER_WIDTH, PLAYER_HEIGHT))
 
-CAR_SIZE = (60, 60)  # Rozmiar samochodu
+CAR_SIZE = (70, 70)  # Rozmiar samochodu
 car_left = pygame.image.load("car_left.png").convert_alpha()
 car_left = pygame.transform.scale(car_left, CAR_SIZE)
 car_right = pygame.image.load("car_right.png").convert_alpha()
@@ -206,7 +206,7 @@ deceleration_car = 0.2  # Zwiększono, aby auto szybciej hamowało
 max_speed_car = 5  # Zmniejszono dla lepszej kontroli
 # --- Koniec zmian dla płynniejszego ruchu ---
 
-buildings = [(100, 0), (730, 225), (390, 380)]  # Pozycje (x,y) lewego górnego rogu budynków
+buildings = [(275, 20), (1800, 400), (1050, 650)]  # Pozycje (x,y) lewego górnego rogu budynków
 facing = "prawo"  # Kierunek postaci
 is_moving = False  # Czy postać się porusza (dla animacji)
 animation_counter = 0
