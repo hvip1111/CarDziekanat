@@ -11,7 +11,7 @@ pygame.init()
 # Ustawienia ekranu
 WIDTH, HEIGHT = 1920, 1080
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Gra Uczelniana")
+pygame.display.set_caption("Car dziekanat")
 
 # --- Zmiany dla Animacji Monety ---
 COIN_SIZE = (40, 40)
@@ -355,6 +355,96 @@ def spawn_coin():
             active_coins.append(new_coin_pos)
 
 
+try:
+    gear_icon_original = pygame.image.load("gear.png").convert_alpha()
+    GEAR_ICON_SIZE = (100, 100) # Możesz dostosować rozmiar ikony
+    gear_icon = pygame.transform.scale(gear_icon_original, GEAR_ICON_SIZE)
+    # Pozycjonowanie w prawym dolnym rogu z marginesem 20px
+    gear_icon_rect = gear_icon.get_rect(bottomright=(WIDTH - 20, HEIGHT - 20))
+except pygame.error as e:
+    print(f"Ostrzeżenie: Nie udało się załadować gear.png: {e}. Ikona ustawień nie będzie dostępna.")
+    gear_icon = None
+    gear_icon_rect = None
+
+def start_screen(is_pause_menu=False):  # Dodano parametr is_pause_menu
+    # Czcionki dla menu
+    title_font = pygame.font.Font('munro.ttf', 100)  # Możesz dostosować rozmiar
+    button_font = pygame.font.Font('munro.ttf', 50)  # Możesz dostosować rozmiar
+
+    # Określenie tekstów w zależności od trybu (menu startowe czy pauza)
+    title_text_content = "Ustawienia" if is_pause_menu else "Car Dziekanat"
+    start_button_text_content = "Wznów" if is_pause_menu else "Start"
+
+    # Definicja prostokątów dla przycisków
+    button_width = 300
+    button_height = 80
+    start_button = pygame.Rect(WIDTH / 2 - button_width / 2, HEIGHT / 2 - button_height / 2 - 50, button_width,
+                               button_height)  # "Start/Wznów" nieco wyżej
+    exit_button = pygame.Rect(WIDTH / 2 - button_width / 2, HEIGHT / 2 + button_height / 2 + 10, button_width,
+                              button_height)  # "Wyjdź" nieco niżej
+
+    # Półprzezroczyste tło dla menu pauzy (aby było widać grę pod spodem)
+    dim_overlay = None
+    if is_pause_menu:
+        dim_overlay = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)  # SRCALPHA dla przezroczystości
+        screen.blit(current_background, (0, 0)) # Czarny kolor z poziomem alfa 180 (0-255)
+
+    menu_running = True
+    while menu_running:
+        mouse_pos = pygame.mouse.get_pos()
+
+        # Rysowanie tła lub przyciemnienia
+        if is_pause_menu and dim_overlay:
+            # W menu pauzy, rysujemy przyciemnienie na aktualnym stanie ekranu gry.
+            # Zakładamy, że główna pętla gry narysowała już klatkę gry,
+            # a to menu jest rysowane na wierzchu.
+            screen.blit(dim_overlay, (0, 0))
+        elif not is_pause_menu:
+            # Dla początkowego ekranu startowego używamy tła mapy
+            screen.blit(background, (0, 0))
+
+        # Rysowanie tytułu
+        title_surf = render_text_with_outline(title_font, title_text_content, WHITE, BLACK, 3)
+        title_rect = title_surf.get_rect(center=(WIDTH / 2, HEIGHT / 4))
+        screen.blit(title_surf, title_rect)
+
+        # Interakcja z przyciskami (zmiana koloru po najechaniu myszką)
+        start_color = BLUE if start_button.collidepoint(mouse_pos) else (
+        0, 0, 180)  # Ciemniejszy niebieski gdy nieaktywny
+        exit_color = RED if exit_button.collidepoint(mouse_pos) else (180, 0, 0)  # Ciemniejszy czerwony gdy nieaktywny
+
+        # Rysowanie przycisków z zaokrąglonymi rogami
+        pygame.draw.rect(screen, start_color, start_button, border_radius=15)
+        pygame.draw.rect(screen, exit_color, exit_button, border_radius=15)
+
+        # Tekst na przyciskach
+        start_text_surf = button_font.render(start_button_text_content, True, WHITE)
+        exit_text_surf = button_font.render("Wyjdź", True, WHITE)
+
+        # Pozycjonowanie tekstu na środku przycisków
+        screen.blit(start_text_surf, start_text_surf.get_rect(center=start_button.center))
+        screen.blit(exit_text_surf, exit_text_surf.get_rect(center=exit_button.center))
+
+        # Pętla zdarzeń dla menu
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:  # Lewy przycisk myszy
+                    if start_button.collidepoint(event.pos):
+                        menu_running = False  # Zamyka menu (czy to start, czy pauza i wznawia grę)
+                    if exit_button.collidepoint(event.pos):
+                        pygame.quit()
+                        sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE and is_pause_menu:  # ESC zamyka menu pauzy
+                    menu_running = False
+
+        pygame.display.flip()
+        clock.tick(FPS)
+
+start_screen(is_pause_menu=False)
 running = True
 while running:
     current_time = pygame.time.get_ticks()
@@ -383,6 +473,13 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        # NOWY BLOK - OBSŁUGA KLIKNIĘCIA MYSZĄ (DLA ZĘBATKI)
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1: # Sprawdzamy, czy kliknięto lewym przyciskiem myszy
+                # Sprawdź, czy kliknięto na ikonę zębatki (jeśli istnieje)
+                if gear_icon and gear_icon_rect and gear_icon_rect.collidepoint(event.pos):
+                    start_screen(is_pause_menu=True) # Wywołaj menu jako menu pauzy
+                    # Pętla gry będzie kontynuowana po zamknięciu menu pauzy
 
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_q and inside_building:
@@ -637,6 +734,9 @@ while running:
         screen.blit(text_surf, text_rect)
     elif action_message and (current_time - action_message_time) >= 2000:
         action_message = None  # Wyczyść wiadomość po czasie
+
+    if gear_icon and gear_icon_rect:
+        screen.blit(gear_icon, gear_icon_rect)
 
     pygame.display.flip()
     clock.tick(FPS)
