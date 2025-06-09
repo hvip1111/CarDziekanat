@@ -69,7 +69,7 @@ pygame.display.set_caption("Car dziekanat - Klient Sieciowy")
 COIN_SIZE = (40, 40)
 coin_frames = []
 try:
-    gif_image = Image.open("graphics icons/coin.gif")
+    gif_image = Image.open("coin.gif")
     if gif_image.n_frames > 0:
         for frame_num in range(gif_image.n_frames):
             gif_image.seek(frame_num)
@@ -116,20 +116,22 @@ BLACK = (0, 0, 0)
 YELLOW = (255, 255, 0)
 GREEN = (0, 128, 0)
 BLUE = (100, 100, 255)
+GREY = (128, 128, 128)
 TASK_BOARD_BG_COLOR = (50, 50, 50, 180)
 
-font = pygame.font.Font('fonts/munro.ttf', 18)
-subject_font = pygame.font.Font('fonts/munro.ttf', 22)
-task_font = pygame.font.Font('fonts/munro.ttf', 20)
+font = pygame.font.Font('munro.ttf', 18)
+subject_font = pygame.font.Font('munro.ttf', 22)
+task_font = pygame.font.Font('munro.ttf', 20)
+garage_font = pygame.font.Font('munro.ttf', 30)
 
 # --- Logika zadań ---
 TASK_ICON_SIZE = (25, 25)
 LINE_SPACING_INSIDE_TASK = 2  # Odstęp między liniami wewnątrz jednego zadania
 try:
-    check_mark_img_orig = pygame.image.load("graphics icons/check_mark.png").convert_alpha()
+    check_mark_img_orig = pygame.image.load("check_mark.png").convert_alpha()
     check_mark_img = pygame.transform.scale(check_mark_img_orig, TASK_ICON_SIZE)
 except FileNotFoundError:
-    print("Ostrzeżenie: Nie znaleziono pliku check_mark.png. Tworzenie zastępczego.")
+    print("Ostrzeżenie: Nie znaleziono pliku chec_mark.png. Tworzenie zastępczego.")
     check_mark_img = pygame.Surface(TASK_ICON_SIZE, pygame.SRCALPHA)
     pygame.draw.line(check_mark_img, GREEN, (5, TASK_ICON_SIZE[1] // 2),
                      (TASK_ICON_SIZE[0] // 2, TASK_ICON_SIZE[1] - 5), 3)
@@ -137,7 +139,7 @@ except FileNotFoundError:
                      3)
 
 try:
-    cross_mark_img_orig = pygame.image.load("graphics icons/cross_mark.png").convert_alpha()
+    cross_mark_img_orig = pygame.image.load("cross_mark.png").convert_alpha()
     cross_mark_img = pygame.transform.scale(cross_mark_img_orig, TASK_ICON_SIZE)
 except FileNotFoundError:
     print("Ostrzeżenie: Nie znaleziono pliku cross_mark.png. Tworzenie zastępczego.")
@@ -381,48 +383,101 @@ START_POSITIONS = {
 }
 
 # Grafiki
-background = pygame.image.load("background/map.png").convert()
+background = pygame.image.load("map.png").convert()
 background = pygame.transform.scale(background, (WIDTH, HEIGHT))
-background1 = pygame.image.load("background/payments.png").convert()
+background1 = pygame.image.load("payments.png").convert()
 background1 = pygame.transform.scale(background1, (WIDTH, HEIGHT))
-background2 = pygame.image.load("background/PE_enrollment.png").convert()
+background2 = pygame.image.load("PE_enrollment.png").convert()
 background2 = pygame.transform.scale(background2, (WIDTH, HEIGHT))
-background3 = pygame.image.load("background/grades.png").convert()
+background3 = pygame.image.load("grades.png").convert()
 background3 = pygame.transform.scale(background3, (WIDTH, HEIGHT))
 
 # Maski kolizji
-road_mask = pygame.image.load("background/map_mask.png").convert_alpha()
+road_mask = pygame.image.load("map_mask.png").convert_alpha()
 road_mask = pygame.transform.scale(road_mask, (WIDTH, HEIGHT))
-payments_mask = pygame.image.load("background/payments_mask.png").convert_alpha()
+payments_mask = pygame.image.load("payments_mask.png").convert_alpha()
 payments_mask = pygame.transform.scale(payments_mask, (WIDTH, HEIGHT))
-pe_enrollment_mask = pygame.image.load("background/PE_enrollment_mask.png").convert_alpha()
+pe_enrollment_mask = pygame.image.load("PE_enrollment_mask.png").convert_alpha()
 pe_enrollment_mask = pygame.transform.scale(pe_enrollment_mask, (WIDTH, HEIGHT))
-grades_mask = pygame.image.load("background/grades_mask.png").convert_alpha()
+grades_mask = pygame.image.load("grades_mask.png").convert_alpha()
 grades_mask = pygame.transform.scale(grades_mask, (WIDTH, HEIGHT))
 
-# Postać i pojazd
+# Postać
 PLAYER_WIDTH, PLAYER_HEIGHT = 100, 100
-prawo_img = pygame.image.load("characters and vehicles/character_right.png").convert_alpha()
+prawo_img = pygame.image.load("character_right.png").convert_alpha()
 prawo_img = pygame.transform.scale(prawo_img, (PLAYER_WIDTH, PLAYER_HEIGHT))
-prawo_idzie_img = pygame.image.load("characters and vehicles/character_right_move.png").convert_alpha()
+prawo_idzie_img = pygame.image.load("character_right_move.png").convert_alpha()
 prawo_idzie_img = pygame.transform.scale(prawo_idzie_img, (PLAYER_WIDTH, PLAYER_HEIGHT))
-lewo_img = pygame.image.load("characters and vehicles/character_left.png").convert_alpha()
+lewo_img = pygame.image.load("character_left.png").convert_alpha()
 lewo_img = pygame.transform.scale(lewo_img, (PLAYER_WIDTH, PLAYER_HEIGHT))
-lewo_idzie_img = pygame.image.load("characters and vehicles/character_left_move.png").convert_alpha()
+lewo_idzie_img = pygame.image.load("character_left_move.png").convert_alpha()
 lewo_idzie_img = pygame.transform.scale(lewo_idzie_img, (PLAYER_WIDTH, PLAYER_HEIGHT))
 
+# === NOWA LOGIKA GARAŻU I POJAZDÓW ===
 CAR_SIZE = (70, 70)
-car_left = pygame.image.load("characters and vehicles/car_left.png").convert_alpha()
-car_left = pygame.transform.scale(car_left, CAR_SIZE)
-car_right = pygame.image.load("characters and vehicles/car_right.png").convert_alpha()
-car_right = pygame.transform.scale(car_right, CAR_SIZE)
-car_up = pygame.image.load("characters and vehicles/car_up.png").convert_alpha()
-car_up = pygame.transform.scale(car_up, CAR_SIZE)
-car_down = pygame.image.load("characters and vehicles/car_down.png").convert_alpha()
-car_down = pygame.transform.scale(car_down, CAR_SIZE)
 
-# Słownik z obrazkami do łatwego dostępu
-car_images = {"left": car_left, "right": car_right, "up": car_up, "down": car_down}
+
+def create_tinted_surface(surface, tint_color):
+    """Tworzy zabarwioną wersję powierzchni, zachowując przezroczystość."""
+    tinted_surf = surface.copy()
+    tinted_surf.fill(tint_color, special_flags=pygame.BLEND_RGBA_MULT)
+    return tinted_surf
+
+
+# Ładowanie bazowych obrazków
+base_car_left = pygame.transform.scale(pygame.image.load("car_left.png").convert_alpha(), CAR_SIZE)
+base_car_right = pygame.transform.scale(pygame.image.load("car_right.png").convert_alpha(), CAR_SIZE)
+base_car_up = pygame.transform.scale(pygame.image.load("car_up.png").convert_alpha(), CAR_SIZE)
+base_car_down = pygame.transform.scale(pygame.image.load("car_down.png").convert_alpha(), CAR_SIZE)
+
+# Baza danych pojazdów
+vehicle_database = {
+    'default': {
+        'name': 'Czerwony Sportowy',
+        'price': 0,
+        'images': {
+            "left": base_car_left,
+            "right": base_car_right,
+            "up": base_car_up,
+            "down": base_car_down
+        }
+    },
+    'blue_car': {
+        'name': 'Niebieski Miejski',
+        'price': 150,
+        'images': {
+            "left": create_tinted_surface(base_car_left, (100, 100, 255)),
+            "right": create_tinted_surface(base_car_right, (100, 100, 255)),
+            "up": create_tinted_surface(base_car_up, (100, 100, 255)),
+            "down": create_tinted_surface(base_car_down, (100, 100, 255))
+        }
+    },
+    'green_van': {
+        'name': 'Zielony Van',
+        'price': 300,
+        'images': {
+            "left": create_tinted_surface(base_car_left, (50, 150, 50)),
+            "right": create_tinted_surface(base_car_right, (50, 150, 50)),
+            "up": create_tinted_surface(base_car_up, (50, 150, 50)),
+            "down": create_tinted_surface(base_car_down, (50, 150, 50))
+        }
+    }
+}
+
+# Stan posiadania pojazdów gracza
+owned_vehicles = ['default']
+current_vehicle_id = 'default'
+
+# Ikona garażu
+GARAGE_ICON_SIZE = (60, 60)
+garage_icon_surf = pygame.Surface(GARAGE_ICON_SIZE, pygame.SRCALPHA)
+garage_icon_surf.fill((100, 100, 100, 180))
+pygame.draw.rect(garage_icon_surf, WHITE, (5, 25, 50, 30))  # Baza garażu
+pygame.draw.polygon(garage_icon_surf, WHITE, [(2, 25), (30, 5), (58, 25)])  # Dach
+garage_icon_rect = None  # Zostanie zainicjowany później
+
+
+# ==========================================
 
 
 # === NOWA KLASA DLA ZDALNYCH GRACZY ===
@@ -442,6 +497,9 @@ class RemotePlayer:
         self.car_direction = state_dict.get("car_direction", "right")
         self.current_background_id = state_dict.get("current_background_id", 0)
         self.color = state_dict.get("color", (255, 0, 255))  # Różowy jako fallback
+        # UWAGA: Na razie nie synchronizujemy wyglądu pojazdu innych graczy
+        # Wszyscy inni gracze będą mieli domyślny wygląd pojazdu
+        self.vehicle_id_remote = 'default'
 
         # Logika animacji dla zdalnego gracza
         if self.image_type == "character" and self.is_moving:
@@ -456,7 +514,8 @@ class RemotePlayer:
     def draw(self, surface):
         img_to_draw = None
         if self.image_type == "car":
-            img_to_draw = car_images.get(self.car_direction)
+            # Używamy domyślnego pojazdu dla zdalnych graczy
+            img_to_draw = vehicle_database[self.vehicle_id_remote]['images'].get(self.car_direction)
             if img_to_draw:
                 surface.blit(img_to_draw, (self.x, self.y))
 
@@ -472,7 +531,7 @@ class RemotePlayer:
         # Rysuj etykietę z ID nad graczem
         label = render_text_with_outline(font, f"Gracz {self.id}", WHITE, BLACK)
         label_rect = label.get_rect(center=(
-        self.x + PLAYER_WIDTH // 2 if self.image_type == 'character' else self.x + CAR_SIZE[0] // 2, self.y - 15))
+            self.x + PLAYER_WIDTH // 2 if self.image_type == 'character' else self.x + CAR_SIZE[0] // 2, self.y - 15))
         surface.blit(label, label_rect)
 
 
@@ -659,7 +718,7 @@ def spawn_coin():
 
 # --- Menu startowe/pauzy ---
 try:
-    gear_icon_original = pygame.image.load("graphics icons/gear.png").convert_alpha()
+    gear_icon_original = pygame.image.load("gear.png").convert_alpha()
     GEAR_ICON_SIZE = (100, 100)
     gear_icon = pygame.transform.scale(gear_icon_original, GEAR_ICON_SIZE)
     gear_icon_rect = gear_icon.get_rect(bottomright=(WIDTH - 20, HEIGHT - 20))
@@ -670,8 +729,8 @@ except pygame.error as e:
 
 
 def start_screen(is_pause_menu=False):
-    title_font = pygame.font.Font('fonts/munro.ttf', 100)
-    button_font = pygame.font.Font('fonts/munro.ttf', 50)
+    title_font = pygame.font.Font('munro.ttf', 100)
+    button_font = pygame.font.Font('munro.ttf', 50)
     title_text_content = "Ustawienia" if is_pause_menu else "Car Dziekanat"
     start_button_text_content = "Wznów" if is_pause_menu else "Start"
     button_width = 300
@@ -725,6 +784,133 @@ def start_screen(is_pause_menu=False):
         pygame.display.flip()
         clock.tick(FPS)
 
+
+# === NOWA FUNKCJA INTERFEJSU GARAŻU ===
+def garage_screen():
+    global coins, current_vehicle_id, owned_vehicles
+
+    game_screen_capture = screen.copy()
+    menu_running = True
+
+    # Układ interfejsu
+    bg_rect = pygame.Rect(WIDTH * 0.1, HEIGHT * 0.1, WIDTH * 0.8, HEIGHT * 0.8)
+    title_font = pygame.font.Font('munro.ttf', 70)
+    vehicle_font = pygame.font.Font('munro.ttf', 35)
+    button_font = pygame.font.Font('munro.ttf', 30)
+
+    button_rects = {}  # Słownik do przechowywania rectów przycisków
+
+    while menu_running:
+        mouse_pos = pygame.mouse.get_pos()
+
+        screen.blit(game_screen_capture, (0, 0))
+        overlay = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+        overlay.fill((0, 0, 0, 180))
+        screen.blit(overlay, (0, 0))
+
+        # Tło menu
+        pygame.draw.rect(screen, (40, 40, 60), bg_rect, border_radius=20)
+        pygame.draw.rect(screen, WHITE, bg_rect, width=3, border_radius=20)
+
+        # Tytuł
+        title_surf = render_text_with_outline(title_font, "Garaż", WHITE, BLACK, 2)
+        screen.blit(title_surf, title_surf.get_rect(centerx=bg_rect.centerx, top=bg_rect.top + 20))
+
+        # Informacja o monetach
+        coins_text_surf = render_text_with_outline(garage_font, f"Twoje monety: {coins}", YELLOW, BLACK)
+        screen.blit(coins_text_surf, coins_text_surf.get_rect(centerx=bg_rect.centerx, top=bg_rect.top + 100))
+
+        # Lista pojazdów
+        current_y = bg_rect.top + 180
+        item_height = 120
+
+        button_rects.clear()
+
+        for vehicle_id, vehicle_data in vehicle_database.items():
+            item_rect = pygame.Rect(bg_rect.left + 20, current_y, bg_rect.width - 40, item_height - 10)
+            pygame.draw.rect(screen, (60, 60, 80) if item_rect.collidepoint(mouse_pos) else (50, 50, 70), item_rect,
+                             border_radius=10)
+
+            # Obrazek pojazdu
+            img = vehicle_data['images']['right']
+            img_rect = img.get_rect(centery=item_rect.centery, left=item_rect.left + 20)
+            screen.blit(img, img_rect)
+
+            # Nazwa pojazdu
+            name_surf = vehicle_font.render(vehicle_data['name'], True, WHITE)
+            screen.blit(name_surf, (img_rect.right + 20, item_rect.top + 20))
+
+            # Przyciski i status
+            button_width, button_height = 200, 50
+            button_x = item_rect.right - button_width - 20
+            button_y = item_rect.centery - button_height // 2
+
+            btn_rect = pygame.Rect(button_x, button_y, button_width, button_height)
+            button_rects[vehicle_id] = btn_rect  # Zapisz rect przycisku
+
+            if vehicle_id in owned_vehicles:
+                if vehicle_id == current_vehicle_id:
+                    status_text = "Wybrany"
+                    btn_color = (80, 80, 80)  # Szary
+                    text_color = GREY
+                else:
+                    status_text = "Wybierz"
+                    btn_color = BLUE if btn_rect.collidepoint(mouse_pos) else (0, 0, 180)
+                    text_color = WHITE
+            else:
+                price = vehicle_data['price']
+                status_text = f"Kup ({price})"
+                if coins >= price:
+                    btn_color = GREEN if btn_rect.collidepoint(mouse_pos) else (0, 150, 0)
+                    text_color = WHITE
+                else:
+                    btn_color = (80, 80, 80)  # Szary
+                    text_color = GREY
+
+            pygame.draw.rect(screen, btn_color, btn_rect, border_radius=10)
+            btn_text_surf = button_font.render(status_text, True, text_color)
+            screen.blit(btn_text_surf, btn_text_surf.get_rect(center=btn_rect.center))
+
+            # Cena dla nieposiadanych pojazdów
+            if vehicle_id not in owned_vehicles:
+                price_surf = vehicle_font.render(f"Cena: {vehicle_data['price']}", True, YELLOW)
+                screen.blit(price_surf, (img_rect.right + 20, item_rect.top + 60))
+
+            current_y += item_height
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                menu_running = False
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                # Sprawdź kliknięcia przycisków
+                for vehicle_id, rect in button_rects.items():
+                    if rect.collidepoint(event.pos):
+                        vehicle_data = vehicle_database[vehicle_id]
+                        if vehicle_id in owned_vehicles:
+                            if vehicle_id != current_vehicle_id:
+                                current_vehicle_id = vehicle_id
+                                print(f"[GARAŻ] Wybrano pojazd: {vehicle_data['name']}")
+                        else:  # Logika zakupu
+                            price = vehicle_data['price']
+                            if coins >= price:
+                                coins -= price
+                                owned_vehicles.append(vehicle_id)
+                                print(f"[GARAŻ] Zakupiono pojazd: {vehicle_data['name']} za {price} monet.")
+                            else:
+                                print(f"[GARAŻ] Za mało monet, by kupić {vehicle_data['name']}.")
+                        break  # Przerwij pętlę po znalezieniu klikniętego przycisku
+                else:  # Jeśli nie kliknięto żadnego przycisku
+                    if not bg_rect.collidepoint(event.pos):
+                        menu_running = False
+
+        pygame.display.flip()
+        clock.tick(FPS)
+
+
+# =======================================
 
 # --- Koniec Menu ---
 
@@ -816,12 +1002,17 @@ while running:
 
     screen.blit(current_background, (0, 0))
 
+    # UI W PRAWMYM GÓRNYM ROGU (MONETY I GARAŻ)
     coins_text_surf = font.render(f"{coins}", True, BLACK)
     coins_text_rect = coins_text_surf.get_rect(topright=(WIDTH - 10, 10))
     screen.blit(coins_text_surf, coins_text_rect)
     coin_display_rect = active_coin_image.get_rect(topright=(
         coins_text_rect.left - 5, coins_text_rect.top + (coins_text_rect.height - active_coin_image.get_height()) // 2))
     screen.blit(active_coin_image, coin_display_rect)
+
+    # Rysowanie ikony garażu
+    garage_icon_rect = garage_icon_surf.get_rect(topright=(coin_display_rect.left - 15, coin_display_rect.top))
+    screen.blit(garage_icon_surf, garage_icon_rect)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -830,6 +1021,10 @@ while running:
             if event.button == 1:
                 if gear_icon and gear_icon_rect and gear_icon_rect.collidepoint(event.pos):
                     start_screen(is_pause_menu=True)
+                # NOWY WARUNEK - KLIKNIĘCIE IKONY GARAŻU
+                if garage_icon_rect and garage_icon_rect.collidepoint(event.pos) and not inside_building:
+                    garage_screen()
+
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_q and inside_building:
                 inside_building = False
@@ -1051,8 +1246,8 @@ while running:
                 near_building = (bx, by);
                 break
 
-        # RYSOWANIE LOKALNEGO GRACZA
-        car_image_to_blit = car_images[car_direction]
+        # RYSOWANIE LOKALNEGO GRACZA - ZMODYFIKOWANE
+        car_image_to_blit = vehicle_database[current_vehicle_id]['images'][car_direction]
         screen.blit(car_image_to_blit, (car_x, car_y))
 
         car_collision_rect = pygame.Rect(car_x, car_y, CAR_SIZE[0], CAR_SIZE[1])
