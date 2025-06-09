@@ -69,7 +69,7 @@ pygame.display.set_caption("Car dziekanat - Klient Sieciowy")
 COIN_SIZE = (40, 40)
 coin_frames = []
 try:
-    gif_image = Image.open("coin.gif")
+    gif_image = Image.open("images/coin.gif")
     if gif_image.n_frames > 0:
         for frame_num in range(gif_image.n_frames):
             gif_image.seek(frame_num)
@@ -81,7 +81,7 @@ try:
             pygame_frame = pygame_frame.convert_alpha()
             coin_frames.append(pygame_frame)
     else:
-        static_coin_img = pygame.image.load("coin.gif").convert_alpha()
+        static_coin_img = pygame.image.load("images/coin.gif").convert_alpha()
         static_coin_img = pygame.transform.scale(static_coin_img, COIN_SIZE)
         coin_frames.append(static_coin_img)
 except FileNotFoundError:
@@ -126,7 +126,7 @@ task_font = pygame.font.Font('munro.ttf', 20)
 TASK_ICON_SIZE = (25, 25)
 LINE_SPACING_INSIDE_TASK = 2  # Odstęp między liniami wewnątrz jednego zadania
 try:
-    check_mark_img_orig = pygame.image.load("check_mark.png").convert_alpha()
+    check_mark_img_orig = pygame.image.load("images/check_mark.png").convert_alpha()
     check_mark_img = pygame.transform.scale(check_mark_img_orig, TASK_ICON_SIZE)
 except FileNotFoundError:
     print("Ostrzeżenie: Nie znaleziono pliku check_mark.png. Tworzenie zastępczego.")
@@ -137,7 +137,7 @@ except FileNotFoundError:
                      3)
 
 try:
-    cross_mark_img_orig = pygame.image.load("cross_mark.png").convert_alpha()
+    cross_mark_img_orig = pygame.image.load("images/cross_mark.png").convert_alpha()
     cross_mark_img = pygame.transform.scale(cross_mark_img_orig, TASK_ICON_SIZE)
 except FileNotFoundError:
     print("Ostrzeżenie: Nie znaleziono pliku cross_mark.png. Tworzenie zastępczego.")
@@ -381,44 +381,44 @@ START_POSITIONS = {
 }
 
 # Grafiki
-background = pygame.image.load("map.png").convert()
+background = pygame.image.load("images/map.png").convert()
 background = pygame.transform.scale(background, (WIDTH, HEIGHT))
-background1 = pygame.image.load("payments.png").convert()
+background1 = pygame.image.load("images/payments.png").convert()
 background1 = pygame.transform.scale(background1, (WIDTH, HEIGHT))
-background2 = pygame.image.load("PE_enrollment.png").convert()
+background2 = pygame.image.load("images/PE_enrollment.png").convert()
 background2 = pygame.transform.scale(background2, (WIDTH, HEIGHT))
-background3 = pygame.image.load("grades.png").convert()
+background3 = pygame.image.load("images/grades.png").convert()
 background3 = pygame.transform.scale(background3, (WIDTH, HEIGHT))
 
 # Maski kolizji
-road_mask = pygame.image.load("map_mask.png").convert_alpha()
+road_mask = pygame.image.load("images/map_mask.png").convert_alpha()
 road_mask = pygame.transform.scale(road_mask, (WIDTH, HEIGHT))
-payments_mask = pygame.image.load("payments_mask.png").convert_alpha()
+payments_mask = pygame.image.load("images/payments_mask.png").convert_alpha()
 payments_mask = pygame.transform.scale(payments_mask, (WIDTH, HEIGHT))
-pe_enrollment_mask = pygame.image.load("PE_enrollment_mask.png").convert_alpha()
+pe_enrollment_mask = pygame.image.load("images/PE_enrollment_mask.png").convert_alpha()
 pe_enrollment_mask = pygame.transform.scale(pe_enrollment_mask, (WIDTH, HEIGHT))
-grades_mask = pygame.image.load("grades_mask.png").convert_alpha()
+grades_mask = pygame.image.load("images/grades_mask.png").convert_alpha()
 grades_mask = pygame.transform.scale(grades_mask, (WIDTH, HEIGHT))
 
 # Postać i pojazd
 PLAYER_WIDTH, PLAYER_HEIGHT = 100, 100
-prawo_img = pygame.image.load("character_right.png").convert_alpha()
+prawo_img = pygame.image.load("images/character_right.png").convert_alpha()
 prawo_img = pygame.transform.scale(prawo_img, (PLAYER_WIDTH, PLAYER_HEIGHT))
-prawo_idzie_img = pygame.image.load("character_right_move.png").convert_alpha()
+prawo_idzie_img = pygame.image.load("images/character_right_move.png").convert_alpha()
 prawo_idzie_img = pygame.transform.scale(prawo_idzie_img, (PLAYER_WIDTH, PLAYER_HEIGHT))
-lewo_img = pygame.image.load("character_left.png").convert_alpha()
+lewo_img = pygame.image.load("images/character_left.png").convert_alpha()
 lewo_img = pygame.transform.scale(lewo_img, (PLAYER_WIDTH, PLAYER_HEIGHT))
-lewo_idzie_img = pygame.image.load("character_left_move.png").convert_alpha()
+lewo_idzie_img = pygame.image.load("images/character_left_move.png").convert_alpha()
 lewo_idzie_img = pygame.transform.scale(lewo_idzie_img, (PLAYER_WIDTH, PLAYER_HEIGHT))
 
 CAR_SIZE = (70, 70)
-car_left = pygame.image.load("car_left.png").convert_alpha()
+car_left = pygame.image.load("images/car_left.png").convert_alpha()
 car_left = pygame.transform.scale(car_left, CAR_SIZE)
-car_right = pygame.image.load("car_right.png").convert_alpha()
+car_right = pygame.image.load("images/car_right.png").convert_alpha()
 car_right = pygame.transform.scale(car_right, CAR_SIZE)
-car_up = pygame.image.load("car_up.png").convert_alpha()
+car_up = pygame.image.load("images/car_up.png").convert_alpha()
 car_up = pygame.transform.scale(car_up, CAR_SIZE)
-car_down = pygame.image.load("car_down.png").convert_alpha()
+car_down = pygame.image.load("images/car_down.png").convert_alpha()
 car_down = pygame.transform.scale(car_down, CAR_SIZE)
 
 # Słownik z obrazkami do łatwego dostępu
@@ -659,7 +659,7 @@ def spawn_coin():
 
 # --- Menu startowe/pauzy ---
 try:
-    gear_icon_original = pygame.image.load("gear.png").convert_alpha()
+    gear_icon_original = pygame.image.load("images/gear.png").convert_alpha()
     GEAR_ICON_SIZE = (100, 100)
     gear_icon = pygame.transform.scale(gear_icon_original, GEAR_ICON_SIZE)
     gear_icon_rect = gear_icon.get_rect(bottomright=(WIDTH - 20, HEIGHT - 20))
