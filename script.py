@@ -817,7 +817,7 @@ while running:
     screen.blit(current_background, (0, 0))
 
     coins_text_surf = font.render(f"{coins}", True, BLACK)
-    coins_text_rect = coins_text_surf.get_rect(topright=(WIDTH - 70, 10))
+    coins_text_rect = coins_text_surf.get_rect(topright=(WIDTH - 10, 10))
     screen.blit(coins_text_surf, coins_text_rect)
     coin_display_rect = active_coin_image.get_rect(topright=(
         coins_text_rect.left - 5, coins_text_rect.top + (coins_text_rect.height - active_coin_image.get_height()) // 2))

@@ -219,8 +219,7 @@ def main():
     clock = pygame.time.Clock()
 
     # Network Setup
-    server_ip_input = input(f"Podaj adres IP serwera (domyślnie 127.0.0.1): ")
-    current_server_host = server_ip_input if server_ip_input else "127.0.0.1"
+    current_server_host = "127.0.0.1"
     network = Network(current_server_host, 5555)
 
     if not network.initial_player_state: return
