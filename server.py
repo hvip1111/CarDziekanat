@@ -1,17 +1,17 @@
 import socket
 import pickle
 import threading
+import random
 
 # Konfiguracja serwera
-SERVER_HOST = "127.0.0.1"  # Nasłuchuj na wszystkich dostępnych interfejsach
+SERVER_HOST = "127.0.0.1"
 SERVER_PORT = 5555
-BUFFER_SIZE = 4096 # Rozmiar bufora dla odbieranych danych, można dostosować
+BUFFER_SIZE = 4096
 
-# Przechowywanie danych graczy (klucz: adres klienta, wartość: dane gracza)
-# Dane gracza mogą być słownikiem, np. {'id': id, 'x': x, 'y': y, 'color': color, ...}
+# Przechowywanie danych graczy
 players_data = {}
 player_id_counter = 0
-lock = threading.Lock() # Do synchronizacji dostępu do players_data
+lock = threading.Lock()
 
 def handle_client(client_socket, client_address):
     global player_id_counter
@@ -20,25 +20,28 @@ def handle_client(client_socket, client_address):
     with lock:
         current_player_id = player_id_counter
         player_id_counter += 1
-        # Inicjalne dane gracza - klient może je zaktualizować
-        # Kolor można przypisać na serwerze lub klient może go wybrać
+        # === ZMIANA: Zaktualizowany stan początkowy, aby pasował do klienta script.py ===
         initial_player_state = {
             "id": current_player_id,
-            "x": 50, # Pozycja startowa X
-            "y": 50, # Pozycja startowa Y
+            "x": 1000,  # Pozycja startowa X (samochód)
+            "y": 530,   # Pozycja startowa Y (samochód)
             "color": (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)),
-            "message": "Połączono"
+            "message": "Połączono",
+            "image_type": "car",  # Gracz zaczyna w samochodzie
+            "car_direction": "right",
+            "facing": "prawo", # Domyślne skierowanie postaci
+            "is_moving": False,
+            "current_background_id": 0 # 0 dla mapy głównej
         }
         players_data[client_address] = initial_player_state
 
-    # Wyślij ID do klienta zaraz po połączeniu
     try:
+        # Wyślij pakiet powitalny z ID i stanem początkowym
         client_socket.send(pickle.dumps({"id": current_player_id, "initial_state": players_data[client_address]}))
     except socket.error as e:
         print(f"[BŁĄD WYSYŁANIA ID] {e}")
-        # Zakończ obsługę tego klienta jeśli nie można wysłać ID
-        if client_address in players_data:
-            with lock:
+        with lock:
+            if client_address in players_data:
                 del players_data[client_address]
         client_socket.close()
         return
@@ -46,41 +49,30 @@ def handle_client(client_socket, client_address):
     connected = True
     while connected:
         try:
-            # Odbierz dane od klienta
             data = client_socket.recv(BUFFER_SIZE)
             if not data:
                 print(f"[ROZŁĄCZONO] {client_address} rozłączył się (brak danych).")
-                break # Klient zamknął połączenie
+                break
 
             received_player_state = pickle.loads(data)
-            # print(f"[ODEBRANO OD {client_address}] {received_player_state}")
 
-            # Zaktualizuj dane tego gracza
             with lock:
-                if client_address in players_data: # Upewnij się, że klient wciąż istnieje
+                if client_address in players_data:
                     players_data[client_address].update(received_player_state)
                 else:
-                    # To nie powinno się zdarzyć jeśli klient nie został usunięty wcześniej
                     print(f"[OSTRZEŻENIE] Otrzymano dane od nieznanego klienta {client_address}")
                     continue
 
-            # Przygotuj dane wszystkich graczy do wysłania
-            # Wysyłamy listę słowników, a nie słownik słowników, aby ułatwić iterację po stronie klienta
             with lock:
                 all_players_list = list(players_data.values())
 
-            # Wyślij zaktualizowany stan gry do *tego* klienta
-            # Można też wysyłać do wszystkich, ale wtedy każdy klient dostaje też swoje dane
-            # Dla uproszczenia, wysyłamy pełny stan do każdego
             client_socket.sendall(pickle.dumps(all_players_list))
-            # print(f"[WYSŁANO DO {client_address}] Stan wszystkich graczy")
 
         except socket.error as e:
             print(f"[BŁĄD SOCKETU] {client_address}: {e}")
-            break # Błąd komunikacji, zakończ pętlę
+            break
         except pickle.PickleError as e:
             print(f"[BŁĄD DESERIALIZACJI] {client_address}: {e}")
-            # Możliwe uszkodzone dane, kontynuuj lub rozłącz
             continue
         except EOFError:
              print(f"[ROZŁĄCZONO] {client_address} zamknął połączenie (EOF).")
@@ -89,19 +81,14 @@ def handle_client(client_socket, client_address):
             print(f"[NIEOCZEKIWANY BŁĄD] {client_address}: {e}")
             break
 
-    # Sprzątanie po rozłączeniu klienta
     print(f"[ROZŁĄCZONO] {client_address} zakończył połączenie.")
     with lock:
         if client_address in players_data:
             del players_data[client_address]
     client_socket.close()
 
-
-import random # Dla kolorów graczy
-
 def main():
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    # Umożliwia ponowne użycie adresu natychmiast po zamknięciu serwera
     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
     try:
@@ -116,11 +103,10 @@ def main():
     try:
         while True:
             client_socket, client_address = server_socket.accept()
-            # Uruchom nowy wątek do obsługi klienta
             thread = threading.Thread(target=handle_client, args=(client_socket, client_address))
-            thread.daemon = True # Wątek zakończy się, gdy główny program się zakończy
+            thread.daemon = True
             thread.start()
-            print(f"[AKTYWNE POŁĄCZENIA] {threading.active_count() - 1}") # -1 bo główny wątek
+            print(f"[AKTYWNE POŁĄCZENIA] {threading.active_count() - 1}")
     except KeyboardInterrupt:
         print("\n[ZAMYKANIE] Serwer jest zamykany...")
     finally:
@@ -129,4 +115,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
