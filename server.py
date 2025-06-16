@@ -20,18 +20,19 @@ def handle_client(client_socket, client_address):
     with lock:
         current_player_id = player_id_counter
         player_id_counter += 1
-        # === ZMIANA: Zaktualizowany stan początkowy, aby pasował do klienta script.py ===
+        # === ZMIANA: Dodano vehicle_id do stanu początkowego ===
         initial_player_state = {
             "id": current_player_id,
-            "x": 1000,  # Pozycja startowa X (samochód)
-            "y": 530,   # Pozycja startowa Y (samochód)
+            "x": 1000,
+            "y": 530,
             "color": (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)),
             "message": "Połączono",
-            "image_type": "car",  # Gracz zaczyna w samochodzie
+            "image_type": "car",
             "car_direction": "right",
-            "facing": "prawo", # Domyślne skierowanie postaci
+            "facing": "prawo",
             "is_moving": False,
-            "current_background_id": 0 # 0 dla mapy głównej
+            "current_background_id": 0,
+            "vehicle_id": "default"  # <-- DODANA LINIA
         }
         players_data[client_address] = initial_player_state
 
@@ -58,6 +59,7 @@ def handle_client(client_socket, client_address):
 
             with lock:
                 if client_address in players_data:
+                    # Ta linia automatycznie zaktualizuje vehicle_id, jeśli zostanie przysłane
                     players_data[client_address].update(received_player_state)
                 else:
                     print(f"[OSTRZEŻENIE] Otrzymano dane od nieznanego klienta {client_address}")

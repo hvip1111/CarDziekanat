@@ -497,9 +497,9 @@ class RemotePlayer:
         self.car_direction = state_dict.get("car_direction", "right")
         self.current_background_id = state_dict.get("current_background_id", 0)
         self.color = state_dict.get("color", (255, 0, 255))  # Różowy jako fallback
-        # UWAGA: Na razie nie synchronizujemy wyglądu pojazdu innych graczy
-        # Wszyscy inni gracze będą mieli domyślny wygląd pojazdu
-        self.vehicle_id_remote = 'default'
+        # === ZMIANA: Odczytywanie ID pojazdu zdalnego gracza ===
+        self.vehicle_id = state_dict.get("vehicle_id", "default")
+
 
         # Logika animacji dla zdalnego gracza
         if self.image_type == "character" and self.is_moving:
@@ -514,8 +514,10 @@ class RemotePlayer:
     def draw(self, surface):
         img_to_draw = None
         if self.image_type == "car":
-            # Używamy domyślnego pojazdu dla zdalnych graczy
-            img_to_draw = vehicle_database[self.vehicle_id_remote]['images'].get(self.car_direction)
+            # === ZMIANA: Używanie vehicle_id do wyboru odpowiedniego obrazka ===
+            # Używamy .get() dla bezpieczeństwa, na wypadek gdyby ID nie istniało - wtedy wróci do default.
+            vehicle_images = vehicle_database.get(self.vehicle_id, vehicle_database['default'])['images']
+            img_to_draw = vehicle_images.get(self.car_direction)
             if img_to_draw:
                 surface.blit(img_to_draw, (self.x, self.y))
 
@@ -957,7 +959,7 @@ while running:
     elif current_background == background3:
         bg_id = 3
 
-    # Stwórz słownik stanu do wysłania
+    # === ZMIANA: Dodanie ID pojazdu do wysyłanego stanu ===
     local_player_state_to_send = {
         "id": my_id,
         "x": current_x,
@@ -966,7 +968,8 @@ while running:
         "is_moving": is_moving,
         "image_type": image_type_to_send,
         "car_direction": car_direction,
-        "current_background_id": bg_id
+        "current_background_id": bg_id,
+        "vehicle_id": current_vehicle_id  # <-- DODANA LINIA
     }
 
     # Wyślij stan i odbierz stan wszystkich graczy
