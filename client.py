@@ -69,7 +69,7 @@ pygame.display.set_caption("Car dziekanat - Klient Sieciowy")
 COIN_SIZE = (40, 40)
 coin_frames = []
 try:
-    gif_image = Image.open("coin.gif")
+    gif_image = Image.open("graphics icons/coin.gif")
     if gif_image.n_frames > 0:
         for frame_num in range(gif_image.n_frames):
             gif_image.seek(frame_num)
