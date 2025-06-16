@@ -119,16 +119,16 @@ BLUE = (100, 100, 255)
 GREY = (128, 128, 128)
 TASK_BOARD_BG_COLOR = (50, 50, 50, 180)
 
-font = pygame.font.Font('munro.ttf', 18)
-subject_font = pygame.font.Font('munro.ttf', 22)
-task_font = pygame.font.Font('munro.ttf', 20)
-garage_font = pygame.font.Font('munro.ttf', 30)
+font = pygame.font.Font('fonts/munro.ttf', 18)
+subject_font = pygame.font.Font('fonts/munro.ttf', 22)
+task_font = pygame.font.Font('fonts/munro.ttf', 20)
+garage_font = pygame.font.Font('fonts/munro.ttf', 30)
 
 # --- Logika zadań ---
 TASK_ICON_SIZE = (25, 25)
 LINE_SPACING_INSIDE_TASK = 2  # Odstęp między liniami wewnątrz jednego zadania
 try:
-    check_mark_img_orig = pygame.image.load("check_mark.png").convert_alpha()
+    check_mark_img_orig = pygame.image.load("graphics icons/check_mark.png").convert_alpha()
     check_mark_img = pygame.transform.scale(check_mark_img_orig, TASK_ICON_SIZE)
 except FileNotFoundError:
     print("Ostrzeżenie: Nie znaleziono pliku chec_mark.png. Tworzenie zastępczego.")
@@ -139,7 +139,7 @@ except FileNotFoundError:
                      3)
 
 try:
-    cross_mark_img_orig = pygame.image.load("cross_mark.png").convert_alpha()
+    cross_mark_img_orig = pygame.image.load("graphics icons/cross_mark.png").convert_alpha()
     cross_mark_img = pygame.transform.scale(cross_mark_img_orig, TASK_ICON_SIZE)
 except FileNotFoundError:
     print("Ostrzeżenie: Nie znaleziono pliku cross_mark.png. Tworzenie zastępczego.")
@@ -383,34 +383,34 @@ START_POSITIONS = {
 }
 
 # Grafiki
-background = pygame.image.load("map.png").convert()
+background = pygame.image.load("background/map.png").convert()
 background = pygame.transform.scale(background, (WIDTH, HEIGHT))
-background1 = pygame.image.load("payments.png").convert()
+background1 = pygame.image.load("background/payments.png").convert()
 background1 = pygame.transform.scale(background1, (WIDTH, HEIGHT))
-background2 = pygame.image.load("PE_enrollment.png").convert()
+background2 = pygame.image.load("background/PE_enrollment.png").convert()
 background2 = pygame.transform.scale(background2, (WIDTH, HEIGHT))
-background3 = pygame.image.load("grades.png").convert()
+background3 = pygame.image.load("background/grades.png").convert()
 background3 = pygame.transform.scale(background3, (WIDTH, HEIGHT))
 
 # Maski kolizji
-road_mask = pygame.image.load("map_mask.png").convert_alpha()
+road_mask = pygame.image.load("background/map_mask.png").convert_alpha()
 road_mask = pygame.transform.scale(road_mask, (WIDTH, HEIGHT))
-payments_mask = pygame.image.load("payments_mask.png").convert_alpha()
+payments_mask = pygame.image.load("background/payments_mask.png").convert_alpha()
 payments_mask = pygame.transform.scale(payments_mask, (WIDTH, HEIGHT))
-pe_enrollment_mask = pygame.image.load("PE_enrollment_mask.png").convert_alpha()
+pe_enrollment_mask = pygame.image.load("background/PE_enrollment_mask.png").convert_alpha()
 pe_enrollment_mask = pygame.transform.scale(pe_enrollment_mask, (WIDTH, HEIGHT))
-grades_mask = pygame.image.load("grades_mask.png").convert_alpha()
+grades_mask = pygame.image.load("background/grades_mask.png").convert_alpha()
 grades_mask = pygame.transform.scale(grades_mask, (WIDTH, HEIGHT))
 
 # Postać
 PLAYER_WIDTH, PLAYER_HEIGHT = 100, 100
-prawo_img = pygame.image.load("character_right.png").convert_alpha()
+prawo_img = pygame.image.load("characters and vehicles/character_right.png").convert_alpha()
 prawo_img = pygame.transform.scale(prawo_img, (PLAYER_WIDTH, PLAYER_HEIGHT))
-prawo_idzie_img = pygame.image.load("character_right_move.png").convert_alpha()
+prawo_idzie_img = pygame.image.load("characters and vehicles/character_right_move.png").convert_alpha()
 prawo_idzie_img = pygame.transform.scale(prawo_idzie_img, (PLAYER_WIDTH, PLAYER_HEIGHT))
-lewo_img = pygame.image.load("character_left.png").convert_alpha()
+lewo_img = pygame.image.load("characters and vehicles/character_left.png").convert_alpha()
 lewo_img = pygame.transform.scale(lewo_img, (PLAYER_WIDTH, PLAYER_HEIGHT))
-lewo_idzie_img = pygame.image.load("character_left_move.png").convert_alpha()
+lewo_idzie_img = pygame.image.load("characters and vehicles/character_left_move.png").convert_alpha()
 lewo_idzie_img = pygame.transform.scale(lewo_idzie_img, (PLAYER_WIDTH, PLAYER_HEIGHT))
 
 # === NOWA LOGIKA GARAŻU I POJAZDÓW ===
@@ -425,10 +425,10 @@ def create_tinted_surface(surface, tint_color):
 
 
 # Ładowanie bazowych obrazków
-base_car_left = pygame.transform.scale(pygame.image.load("car_left.png").convert_alpha(), CAR_SIZE)
-base_car_right = pygame.transform.scale(pygame.image.load("car_right.png").convert_alpha(), CAR_SIZE)
-base_car_up = pygame.transform.scale(pygame.image.load("car_up.png").convert_alpha(), CAR_SIZE)
-base_car_down = pygame.transform.scale(pygame.image.load("car_down.png").convert_alpha(), CAR_SIZE)
+base_car_left = pygame.transform.scale(pygame.image.load("characters and vehicles/car_left.png").convert_alpha(), CAR_SIZE)
+base_car_right = pygame.transform.scale(pygame.image.load("characters and vehicles/car_right.png").convert_alpha(), CAR_SIZE)
+base_car_up = pygame.transform.scale(pygame.image.load("characters and vehicles/car_up.png").convert_alpha(), CAR_SIZE)
+base_car_down = pygame.transform.scale(pygame.image.load("characters and vehicles/car_down.png").convert_alpha(), CAR_SIZE)
 
 # Baza danych pojazdów
 vehicle_database = {
@@ -718,7 +718,7 @@ def spawn_coin():
 
 # --- Menu startowe/pauzy ---
 try:
-    gear_icon_original = pygame.image.load("gear.png").convert_alpha()
+    gear_icon_original = pygame.image.load("graphics icons/gear.png").convert_alpha()
     GEAR_ICON_SIZE = (100, 100)
     gear_icon = pygame.transform.scale(gear_icon_original, GEAR_ICON_SIZE)
     gear_icon_rect = gear_icon.get_rect(bottomright=(WIDTH - 20, HEIGHT - 20))
@@ -729,8 +729,8 @@ except pygame.error as e:
 
 
 def start_screen(is_pause_menu=False):
-    title_font = pygame.font.Font('munro.ttf', 100)
-    button_font = pygame.font.Font('munro.ttf', 50)
+    title_font = pygame.font.Font('fonts/munro.ttf', 100)
+    button_font = pygame.font.Font('fonts/munro.ttf', 50)
     title_text_content = "Ustawienia" if is_pause_menu else "Car Dziekanat"
     start_button_text_content = "Wznów" if is_pause_menu else "Start"
     button_width = 300
@@ -794,9 +794,9 @@ def garage_screen():
 
     # Układ interfejsu
     bg_rect = pygame.Rect(WIDTH * 0.1, HEIGHT * 0.1, WIDTH * 0.8, HEIGHT * 0.8)
-    title_font = pygame.font.Font('munro.ttf', 70)
-    vehicle_font = pygame.font.Font('munro.ttf', 35)
-    button_font = pygame.font.Font('munro.ttf', 30)
+    title_font = pygame.font.Font('fonts/munro.ttf', 70)
+    vehicle_font = pygame.font.Font('fonts/munro.ttf', 35)
+    button_font = pygame.font.Font('fonts/munro.ttf', 30)
 
     button_rects = {}  # Słownik do przechowywania rectów przycisków
 
